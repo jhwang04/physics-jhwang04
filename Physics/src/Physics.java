@@ -7,6 +7,9 @@ import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;
 
 public class Physics extends PApplet {
+	
+	// Only updates when mouse is clicked when true
+	private boolean debugUpdateMode = true;
 
 	public static void main(String[] args) {
 		Physics applet = new Physics();
@@ -26,7 +29,7 @@ public class Physics extends PApplet {
 	PhysicsSimulator sim ;
 	
 	public Physics() {
-		sim = new PhysicsSimulator(this);
+		sim = new PhysicsSimulator();
 	}
 	
 	public void settings() {
@@ -34,6 +37,14 @@ public class Physics extends PApplet {
 	}
 	
 	public void draw() {
-		sim.update();
+		if(!debugUpdateMode)
+			sim.update();
+		
+		sim.draw(this);
+	}
+	
+	public void mousePressed() {
+		if(debugUpdateMode)
+			sim.update();
 	}
 }
