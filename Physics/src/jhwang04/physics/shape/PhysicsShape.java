@@ -3,6 +3,7 @@ package jhwang04.physics.shape;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import jhwang04.physics.PhysicsSimulator;
 import processing.core.PApplet;
 
 /**
@@ -172,7 +173,92 @@ public abstract class PhysicsShape {
 	 * @post The implicit object will have a new vX, vY and omega
 	 */
 	public void applyForce(float x, float y, float magnitude, float direction) {
-		// Need to perform actual calculations later to find new translational and rotational velocities.
+		//System.out.println("force x = " + x + ", force y = " + y + ", magnitude = " + magnitude + ", direction = " + direction);
+		//distance to COM, in meters
+		float distanceToCOM = (float) Math.sqrt((x - this.x) * (x - this.x) + (y - this.y) * (y - this.y)) / PhysicsSimulator.METER;
+		//System.out.println("distanceToCOM = " + distanceToCOM);
+		
+		//angle that the force applied deviates from being towards the center of mass
+		float deviationAngle = 0;
+		
+		if(distanceToCOM >= 0.001f) { //if force is not being applied to the center of mass (if it is, then deviationAngle stays 0)
+			
+			// range of thetaCOM (theta towards center of mass) is [-PI/2, 3PI/2)
+			float difXCOM = x - this.x;
+			float difYCOM = this.y - y;
+			float thetaCOM = (float) Math.atan(difYCOM/difXCOM);
+			if(difXCOM > 0) // makes sure that thetaCOM is rotated towards COM, and not away
+				thetaCOM = (float) (thetaCOM + Math.PI);
+			
+			// normalizes direction to have the same range as thetaCOM [-PI/2, 3PI/2)
+			while(!(direction < (0 - Math.PI/2) || direction >= (3 * Math.PI / 2))) {
+				if(direction < (0 - Math.PI/2))
+					direction += (2 * Math.PI);
+				else if(direction >= (3 * Math.PI / 2))
+					direction -= (2 * Math.PI);
+			}
+			
+			deviationAngle = Math.abs(direction - thetaCOM);
+			
+		}
+		//System.out.println("devationAngle = " + deviationAngle);
+		
+		
+		
+		//TODO: Make Tau positive/negative depending on the direction, so that deltaL can be neg, and omega_f can be less than omega_i
+		
+		//
+		// CHANGE IN ROTATION
+		//
+		
+		float torque = magnitude * distanceToCOM * (float) Math.sin(deviationAngle); // Tau = Force * radius * sin(theta)
+		
+		float deltaL = torque * (1/60.0f); // Change in L (angular momentum) = Tau * time (at 60fps)
+		
+		// Finding final angular velocity
+		//
+		// L_i = inertia * omega_i                              Initial angular momentum = I * w
+		// L_f = L_i + deltaL  						 			Final angular momentum = Initial L + Delta L
+		// inertia * omega_i + deltaL = inertia * omega_f		Substitute variables
+		// omega_f = (inertia * omega_i + deltaL) / inertia		Isolate for final omega
+		
+		float omega_f = (inertia * omega + deltaL) / inertia;
+		
+		//System.out.println("torque, deltaL, omega_f = " + torque + ", " + deltaL + ", " + omega_f);
+		
+		
+		
+		//
+		// CHANGE IN TRANSLATION
+		//
+		
+		float translationForce = magnitude * (float) Math.abs(Math.cos(deviationAngle)); // i'm totally guessing on this, but it seems reasonable
+		float translationForceX = translationForce * (float) Math.cos(direction);
+		float translationForceY = translationForce * (float) Math.sin(direction);
+		
+		float deltaPX = translationForceX * (1/60.0f); // Change in P (linear momentum) = Force * time (at 60fps)
+		float deltaPY = translationForceY * (1/60.0f);
+		
+		// Finding final linear velocity
+		//
+		// P_ix = vx_i * mass									Momentum = velocity * mass
+		// P_fx = P_ix + deltaPX								Final momentum = Initial P + Delta P
+		// mass * vx_f = mass * vi_x + deltaPX					Substitute for variables
+		// vx_f = (mass * vx_i + deltaPX) / mass				Isolate for v_fx (final velocity x)
+		
+		float vx_f = (mass * vX + deltaPX) / mass;
+		float vy_f = (mass * vY + deltaPY) / mass;
+
+		//System.out.println("translationForce, translationForceX, translationForceY = " + translationForce + ", " + translationForceX + ", " + translationForceY);
+		//System.out.println("deltaPX, deltaPY = " + deltaPX + ", " + deltaPY);
+		
+		//System.out.println("Before vx, vy, omega = " + vX + ", " + vY + ", " + omega);
+		// Applying values calculated above
+		vX = vx_f;
+		vY = vy_f;
+		omega = omega_f;
+		//System.out.println("After vx, vy, omega = " + vX + ", " + vY + ", " + omega);
+		
 	}
 	
 	/**
@@ -180,10 +266,15 @@ public abstract class PhysicsShape {
 	 */
 	public void act() {
 		// Assumes FPS is 60
-		x += (vX / 60.0f);
-		y += (vY / 60.0f);
+		x += (vX * PhysicsSimulator.METER / 60.0f);
+		y -= (vY * PhysicsSimulator.METER / 60.0f); //flipped because positive vY should cause upward motion
 		rotation += (omega / 60.0f);
-		rotate(omega / 60.0f);
+		
+		translateLines(0, (vX * PhysicsSimulator.METER /60.0f));
+		translateLines(1, 0 - (vY * PhysicsSimulator.METER /60.0f)); //flipped because positive vY should cause upward motion
+		rotateLines(omega / 60.0f);
+		
+		//System.out.println("time = " + System.currentTimeMillis() + ", x = " + x + ", y = " + y + ", rotation = " + rotation);
 	}
 	
 	/**
@@ -208,7 +299,7 @@ public abstract class PhysicsShape {
 	 * Rotates all Lines counterclockwise by the given angle, in radians.
 	 * @param radians New rotation, coutnerclockwise, in radians
 	 */
-	protected void rotate(float radians) {
+	protected void rotateLines(float radians) {
 		for(Line line : lines) {
 			rotateLine(line, radians);
 		}
@@ -229,6 +320,34 @@ public abstract class PhysicsShape {
 		
 		line.setPoint1(newX1, newY1);
 		line.setPoint2(newX2, newY2);
+	}
+	
+	/**
+	 * Translates all Lines along the given axis
+	 * @param axis Axis to translate along (0 = x axis, 1 = y axis)
+	 * @param amount Number of pixels to translate
+	 */
+	protected void translateLines(int axis, float amount) {
+		for(Line line : lines) {
+			translateLine(line, axis, amount);
+		}
+	}
+	
+	/**
+	 * Adds the given rotation to the given Line about the PhysicsShape's center of mass.
+	 * @param line The Line to rotate
+	 * @param axis Axis of translation (0 = x axis, 1 = y axis)
+	 * @param amount Number of pixels to be translated along the given axis
+	 * @post The explicit Line will have new start and end points, translated
+	 */
+	private void translateLine(Line line, float axis, float amount) {
+		if(axis == 0) { // x-axis
+			line.setPoint1(line.getX() + amount, line.getY());
+			line.setPoint2(line.getX2() + amount, line.getY2());
+		} else if(axis == 1) { // y-axis
+			line.setPoint1(line.getX(), line.getY() + amount);
+			line.setPoint2(line.getX2(), line.getY2() + amount);
+		}
 	}
 	
 	

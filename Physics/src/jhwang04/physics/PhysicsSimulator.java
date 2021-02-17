@@ -79,7 +79,7 @@ public class PhysicsSimulator {
 
 		// Adding force of gravity to each shape, directly downward.
 		for(PhysicsShape shape : shapes) {
-			forces.add(new Object[] {shape, shape.getX(), shape.getY(), shape.getMass() * 9.81 * METER, 0 - (float) (Math.PI / 2.0) } );
+			forces.add(new Object[] {shape, shape.getX(), shape.getY(), shape.getMass() * 9.81f, 0 - (float) (Math.PI / 2.0) } );
 		}
 		
 		// Applying each force to the shapes to set new vX, vY and omega values for this tick.

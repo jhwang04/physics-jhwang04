@@ -78,6 +78,7 @@ public class PhysicsRectangle extends PhysicsShape {
 		this(x, y, mass, width, height);
 		setFillColor(fillColor);
 		setStrokeColor(strokeColor);
+		setInertia( (mass * (width * width + height * height) ) / 12.0f );
 	}
 	
 	
