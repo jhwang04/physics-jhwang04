@@ -12,6 +12,18 @@ import processing.core.PApplet;
  */
 public class PhysicsSimulator {
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	//                      CONSTANTS
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	public static final float METER = 100;
+	
+	
+	
+	
+	
+	
+	
+	
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	//                      FIELDS
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	
@@ -63,6 +75,11 @@ public class PhysicsSimulator {
 				if(!(shape == shape2))
 					forces.addAll(shape.allForcesFromShape(shape2));
 			}
+		}
+
+		// Adding force of gravity to each shape, directly downward.
+		for(PhysicsShape shape : shapes) {
+			forces.add(new Object[] {shape, shape.getX(), shape.getY(), shape.getMass() * 9.81 * METER, 0 - (float) (Math.PI / 2.0) } );
 		}
 		
 		// Applying each force to the shapes to set new vX, vY and omega values for this tick.

@@ -27,7 +27,7 @@ public abstract class PhysicsShape {
 	private float y;
 	
 	/**
-	 * Rotation is in radians, clockwise.
+	 * Rotation is in radians, counterclockwise.
 	 */
 	private float rotation;
 	
@@ -93,7 +93,7 @@ public abstract class PhysicsShape {
 	}
 	
 	/**
-	 * Creates a new PhysicsShape with position and velocity
+	 * Creates a new PhysicsShape with position and mass
 	 * @param x X-coordinate of the center of mass
 	 * @param y Y-coordinate of the center of mass
 	 * @param mass Starting mass
@@ -110,6 +110,7 @@ public abstract class PhysicsShape {
 		this.inertia = mass;
 		this.fillColor = new Color(200, 200, 200);
 		this.strokeColor = new Color(0, 0, 0);
+		lines = new ArrayList<Line>();
 	}
 	
 	
@@ -167,7 +168,7 @@ public abstract class PhysicsShape {
 	 * @param x The x-coordinate of the collision
 	 * @param y The y-coordinate of the collision
 	 * @param magnitude The magnitude of the force applied
-	 * @param direction The direction of the force applied
+	 * @param direction The direction of the force applied, where 0 is directly to the right, going counterclockwise in radians (like the unit circle)
 	 * @post The implicit object will have a new vX, vY and omega
 	 */
 	public void applyForce(float x, float y, float magnitude, float direction) {
@@ -182,6 +183,7 @@ public abstract class PhysicsShape {
 		x += (vX / 60.0f);
 		y += (vY / 60.0f);
 		rotation += (omega / 60.0f);
+		rotate(omega / 60.0f);
 	}
 	
 	/**
@@ -200,6 +202,33 @@ public abstract class PhysicsShape {
 			applet.stroke(strokeColor.getRed(), strokeColor.getGreen(), strokeColor.getBlue());
 		else
 			applet.noStroke();
+	}
+	
+	/**
+	 * Rotates all Lines counterclockwise by the given angle, in radians.
+	 * @param radians New rotation, coutnerclockwise, in radians
+	 */
+	protected void rotate(float radians) {
+		for(Line line : lines) {
+			rotateLine(line, radians);
+		}
+	}
+	
+	/**
+	 * Adds the given rotation to the given Line about the PhysicsShape's center of mass.
+	 * @param line The Line to rotate
+	 * @param newRotation New rotation (in radians)
+	 * @post The explicit Line will have new start and end points.
+	 */
+	private void rotateLine(Line line, float newRotation) {
+		float newX1 = (float) (x + (line.getX() - x) * Math.cos(newRotation) - (y - line.getY()) * Math.sin(newRotation));
+		float newY1 = (float) (y - (line.getX() - x) * Math.sin(newRotation) - (y - line.getY()) * Math.cos(newRotation));
+
+		float newX2 = (float) (x + (line.getX2() - x) * Math.cos(newRotation) - (y - line.getY2()) * Math.sin(newRotation));
+		float newY2 = (float) (y - (line.getX2() - x) * Math.sin(newRotation) - (y - line.getY2()) * Math.cos(newRotation));
+		
+		line.setPoint1(newX1, newY1);
+		line.setPoint2(newX2, newY2);
 	}
 	
 	
@@ -381,5 +410,13 @@ public abstract class PhysicsShape {
 	 */
 	public ArrayList<Line> getLines() {
 		return lines;
+	}
+	
+	/**
+	 * Adds the specified Line to the field "lines"
+	 * @param line The line to add to the ArrayList
+	 */
+	public void addLine(Line line) {
+		lines.add(line);
 	}
 }

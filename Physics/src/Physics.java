@@ -1,16 +1,14 @@
+import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
 import jhwang04.physics.PhysicsSimulator;
+import jhwang04.physics.shape.PhysicsRectangle;
 import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;
 
 public class Physics extends PApplet {
-	
-	// Only updates when mouse is clicked when true
-	private boolean debugUpdateMode = true;
-
 	public static void main(String[] args) {
 		Physics applet = new Physics();
 		PApplet.runSketch(new String[]{""}, applet);
@@ -26,10 +24,20 @@ public class Physics extends PApplet {
 	}
 
 	
-	PhysicsSimulator sim ;
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	//                      FIELDS
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	
+	// Only updates when mouse is clicked when true
+	private boolean debugUpdateMode = true;
+	
+	PhysicsSimulator sim;
+	
+	
 	
 	public Physics() {
 		sim = new PhysicsSimulator();
+		sim.addShape(new PhysicsRectangle(200, 200, 10, 100, 150, Color.RED, Color.BLACK));
 	}
 	
 	public void settings() {
@@ -37,10 +45,13 @@ public class Physics extends PApplet {
 	}
 	
 	public void draw() {
+		background(255);
 		if(!debugUpdateMode)
 			sim.update();
 		
 		sim.draw(this);
+		fill(0);
+		text("x: " + mouseX + ", y " + mouseY, mouseX, mouseY);
 	}
 	
 	public void mousePressed() {
