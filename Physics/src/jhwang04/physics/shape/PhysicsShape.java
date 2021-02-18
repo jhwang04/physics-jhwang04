@@ -138,6 +138,7 @@ public abstract class PhysicsShape {
 			for(Line line : lines) {
 				for(Line otherLine : otherShape.getLines()) {
 					if(line.intersects(otherLine)) {
+						//System.out.println(line + ", " + otherLine);
 						Float[] magAndDir = findMagnitudeAndDirection(otherShape, line, otherLine);
 						forces.add(new Object[] {this, line.getIntersectionX(otherLine), line.getIntersectionY(otherLine), magAndDir[0], magAndDir[1]});
 					}

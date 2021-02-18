@@ -109,13 +109,13 @@ public class Line{
 		//System.out.println(other);
 		//System.out.println("x = " + x + " , y = " + y);
 		
-		if(isBetween(x, x, x2) && isBetween(x, other.x, other.x2) && isBetween(y, y, y2) && isBetween(y, other.y, other.y2))
+		if(isBetween(x, this.x, x2) && isBetween(x, other.x, other.x2) && isBetween(y, this.y, y2) && isBetween(y, other.y, other.y2))
 			return true;
 		else if(Float.isNaN(x)) {
-			Line line1 = new Line(x, y, other.x2, other.y2);
-			Line line2 = new Line(other.x, other.y, x2, y2);
-			if(Float.isNaN(line1.getIntersectionX(line2))) 
-				if((isBetween(x, other.x, other.x2) || isBetween(x2, other.x, other.x2)) && (isBetween(y, other.y, other.y2) || isBetween(y2, other.y, other.y2)))
+			Line line1 = new Line(getX(), getY(), other.x2, other.y2);
+			Line line2 = new Line(other.getX(), other.getY(), x2, y2);
+			if(Double.isNaN(line1.getIntersectionX(line2))) 
+				if((isBetween(getX(), other.getX(), other.x2) || isBetween(x2, other.getX(), other.x2)) && (isBetween(getY(), other.getY(), other.y2) || isBetween(y2, other.getY(), other.y2)))
 					return true;
 		}
 		return false;
@@ -137,19 +137,22 @@ public class Line{
 		System.out.println("Intersection X = " + x);
 		System.out.println("Intersection Y = " + y);
 		
-		//System.out.println(this);
-		//System.out.println(other);
+		System.out.println(this);
+		System.out.println(other);
 		//System.out.println("x = " + x + " , y = " + y);
 		
-		if(isBetween(x, x, x2) && isBetween(x, other.x, other.x2) && isBetween(y, y, y2) && isBetween(y, other.y, other.y2))
+		System.out.println(isBetween(x, this.x, x2) && isBetween(x, other.x, other.x2) && isBetween(y, this.y, y2) && isBetween(y, other.y, other.y2));
+		
+		if(isBetween(x, this.x, x2) && isBetween(x, other.x, other.x2) && isBetween(y, this.y, y2) && isBetween(y, other.y, other.y2))
 			return true;
 		else if(Float.isNaN(x)) {
-			Line line1 = new Line(x, y, other.x2, other.y2);
-			Line line2 = new Line(other.x, other.y, x2, y2);
-			if(Float.isNaN(line1.getIntersectionX(line2))) 
-				if((isBetween(x, other.x, other.x2) || isBetween(x2, other.x, other.x2)) && (isBetween(y, other.y, other.y2) || isBetween(y2, other.y, other.y2)))
+			Line line1 = new Line(getX(), getY(), other.x2, other.y2);
+			Line line2 = new Line(other.getX(), other.getY(), x2, y2);
+			if(Double.isNaN(line1.getIntersectionX(line2))) 
+				if((isBetween(getX(), other.getX(), other.x2) || isBetween(x2, other.getX(), other.x2)) && (isBetween(getY(), other.getY(), other.y2) || isBetween(y2, other.getY(), other.y2)))
 					return true;
 		}
+		
 		return false;
 	}
 	
