@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 
 import jhwang04.physics.PhysicsSimulator;
 import jhwang04.physics.shape.PhysicsRectangle;
+import jhwang04.physics.shape.PhysicsShape;
 import processing.awt.PSurfaceAWT;
 import processing.core.PApplet;
 
@@ -29,7 +30,7 @@ public class Physics extends PApplet {
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	
 	// Only updates when mouse is clicked when true
-	private boolean debugUpdateMode = false;
+	private boolean debugUpdateMode = true;
 	
 	PhysicsSimulator sim;
 	
@@ -38,6 +39,7 @@ public class Physics extends PApplet {
 	public Physics() {
 		sim = new PhysicsSimulator();
 		sim.addShape(new PhysicsRectangle(200, 200, 10, 100, 150, Color.RED, Color.BLACK));
+		
 	}
 	
 	public void settings() {

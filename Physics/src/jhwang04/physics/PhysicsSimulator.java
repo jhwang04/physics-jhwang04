@@ -1,6 +1,9 @@
 package jhwang04.physics;
 
+import java.awt.Color;
 import java.util.ArrayList;
+
+import jhwang04.physics.shape.PhysicsRectangle;
 import jhwang04.physics.shape.PhysicsShape;
 import processing.core.PApplet;
 
@@ -30,8 +33,12 @@ public class PhysicsSimulator {
 	/**
 	 * ArrayList of all the shapes that this PhysicsSimulator contains
 	 */
-	ArrayList<PhysicsShape> shapes;
+	private ArrayList<PhysicsShape> shapes;
 	
+	/**
+	 * Rectangle that represents the ground
+	 */
+	private PhysicsRectangle ground;
 	
 	
 	
@@ -49,6 +56,10 @@ public class PhysicsSimulator {
 	 */
 	public PhysicsSimulator() {
 		shapes = new ArrayList<PhysicsShape>();
+		
+		ground = new PhysicsRectangle(400, 800, 1000000, 1000, 200, new Color(200, 200, 200), new Color(0));
+		shapes.add(ground);
+		
 	}
 	
 	
@@ -79,7 +90,13 @@ public class PhysicsSimulator {
 
 		// Adding force of gravity to each shape, directly downward.
 		for(PhysicsShape shape : shapes) {
-			forces.add(new Object[] {shape, shape.getX(), shape.getY(), shape.getMass() * 9.81f, 0 - (float) (Math.PI / 2.0) } );
+			if(!shape.equals(ground))
+				forces.add(new Object[] {shape, shape.getX(), shape.getY(), shape.getMass() * 9.81f, 0 - (float) (Math.PI / 2.0) } );
+		}
+		
+		// tester, applies sideways force to the left
+		if(shapes.get(1).getY() == 200.0f) {
+			forces.add(new Object[] {shapes.get(1), 200f, 125f, 1000f, /*(float) Math.PI*/ 0f});
 		}
 		
 		// Applying each force to the shapes to set new vX, vY and omega values for this tick.
@@ -144,4 +161,12 @@ public class PhysicsSimulator {
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	//                  GET/SET METHODS
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	
+	/**
+	 * Returns the current ArrayList of shapes
+	 * @return The shapes field
+	 */
+	public ArrayList<PhysicsShape> getShapes() {
+		return shapes;
+	}
 }

@@ -2,6 +2,7 @@ package jhwang04.physics.shape;
 
 import java.awt.Color;
 
+import jhwang04.physics.PhysicsSimulator;
 import processing.core.PApplet;
 
 public class PhysicsRectangle extends PhysicsShape {
@@ -78,7 +79,11 @@ public class PhysicsRectangle extends PhysicsShape {
 		this(x, y, mass, width, height);
 		setFillColor(fillColor);
 		setStrokeColor(strokeColor);
-		setInertia( (mass * (width * width + height * height) ) / 12.0f );
+		
+		float widthMeters = width / PhysicsSimulator.METER;
+		float heightMeters = height / PhysicsSimulator.METER;
+		
+		setInertia( (mass * (widthMeters * widthMeters + heightMeters * heightMeters) ) / 12.0f );
 	}
 	
 	

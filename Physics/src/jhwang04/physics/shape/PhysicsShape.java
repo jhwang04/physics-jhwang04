@@ -173,7 +173,7 @@ public abstract class PhysicsShape {
 	 * @post The implicit object will have a new vX, vY and omega
 	 */
 	public void applyForce(float x, float y, float magnitude, float direction) {
-		//System.out.println("force x = " + x + ", force y = " + y + ", magnitude = " + magnitude + ", direction = " + direction);
+		//System.out.println("\n\nforce x = " + x + ", force y = " + y + ", magnitude = " + magnitude + ", direction = " + direction);
 		//distance to COM, in meters
 		float distanceToCOM = (float) Math.sqrt((x - this.x) * (x - this.x) + (y - this.y) * (y - this.y)) / PhysicsSimulator.METER;
 		//System.out.println("distanceToCOM = " + distanceToCOM);
@@ -181,17 +181,35 @@ public abstract class PhysicsShape {
 		//angle that the force applied deviates from being towards the center of mass
 		float deviationAngle = 0;
 		
+		
+		
+		// range of thetaCOM (theta towards center of mass) is [-PI/2, 3PI/2)
+		float difXCOM = x - this.x;
+		float difYCOM = this.y - y;
+		float thetaCOM = (float) Math.atan(difYCOM/difXCOM);
+		//System.out.println("difXCom = " + difXCOM + ", difYCom = " + difYCOM);
+		
+		//System.out.println("initial thetaCOM = " + thetaCOM);
+		
+		// Ensures that thetaCOM is oriented correctly if line is vertical
+		if(thetaCOM == (float) (Math.PI/2.0))
+			if(this.y - y > 0)
+				thetaCOM = 0 - (float) (Math.PI / 2.0);
+			else
+				thetaCOM = (float) (Math.PI / 2.0);
+		
+		//System.out.println("fixed thetaCOM = " + thetaCOM);
+		
+		
+		
 		if(distanceToCOM >= 0.001f) { //if force is not being applied to the center of mass (if it is, then deviationAngle stays 0)
 			
-			// range of thetaCOM (theta towards center of mass) is [-PI/2, 3PI/2)
-			float difXCOM = x - this.x;
-			float difYCOM = this.y - y;
-			float thetaCOM = (float) Math.atan(difYCOM/difXCOM);
 			if(difXCOM > 0) // makes sure that thetaCOM is rotated towards COM, and not away
 				thetaCOM = (float) (thetaCOM + Math.PI);
 			
 			// normalizes direction to have the same range as thetaCOM [-PI/2, 3PI/2)
-			while(!(direction < (0 - Math.PI/2) || direction >= (3 * Math.PI / 2))) {
+			while(direction < (0 - Math.PI/2) || direction >= (3 * Math.PI / 2)) {
+				System.out.println(direction);
 				if(direction < (0 - Math.PI/2))
 					direction += (2 * Math.PI);
 				else if(direction >= (3 * Math.PI / 2))
@@ -200,10 +218,13 @@ public abstract class PhysicsShape {
 			
 			deviationAngle = Math.abs(direction - thetaCOM);
 			
+			if(deviationAngle > Math.PI)
+				deviationAngle = (float)  (Math.PI * 2) - deviationAngle;
+			
 		}
-		//System.out.println("devationAngle = " + deviationAngle);
+		System.out.println("devationAngle = " + deviationAngle);
 		
-		
+		boolean isTorqueNegative = (thetaCOM - direction) < 0 && (thetaCOM - direction) > (0 - Math.PI);
 		
 		//TODO: Make Tau positive/negative depending on the direction, so that deltaL can be neg, and omega_f can be less than omega_i
 		
@@ -212,6 +233,9 @@ public abstract class PhysicsShape {
 		//
 		
 		float torque = magnitude * distanceToCOM * (float) Math.sin(deviationAngle); // Tau = Force * radius * sin(theta)
+		
+		if(isTorqueNegative)
+			torque *= -1;
 		
 		float deltaL = torque * (1/60.0f); // Change in L (angular momentum) = Tau * time (at 60fps)
 		
@@ -224,6 +248,7 @@ public abstract class PhysicsShape {
 		
 		float omega_f = (inertia * omega + deltaL) / inertia;
 		
+		//System.out.println("inertia, omega_i = " + inertia + ", " + omega);
 		//System.out.println("torque, deltaL, omega_f = " + torque + ", " + deltaL + ", " + omega_f);
 		
 		
