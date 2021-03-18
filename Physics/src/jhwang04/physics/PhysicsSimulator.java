@@ -96,7 +96,7 @@ public class PhysicsSimulator {
 		
 		// tester, applies sideways force to the left
 		if(shapes.get(1).getY() == 200.0f) {
-			forces.add(new Object[] {shapes.get(1), 200f, 125f, 1000f, (float) Math.PI});
+			forces.add(new Object[] {shapes.get(1), 300f, 125f, 1000f, (float) Math.PI});
 		}
 		
 		// Applying each force to the shapes to set new vX, vY and omega values for this tick.

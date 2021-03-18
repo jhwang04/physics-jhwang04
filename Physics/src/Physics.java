@@ -30,7 +30,7 @@ public class Physics extends PApplet {
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	
 	// Only updates when mouse is clicked when true
-	private boolean debugUpdateMode = true;
+	private boolean debugUpdateMode = false;
 	
 	PhysicsSimulator sim;
 	

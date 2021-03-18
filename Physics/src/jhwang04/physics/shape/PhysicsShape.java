@@ -155,7 +155,7 @@ public abstract class PhysicsShape {
 	 * @param shape2 The PhysicsShape that the implicit PhysicsShape collides with
 	 * @param line1 The Line of the implicit PhysicsShape that is collided with
 	 * @param line2 The Line of shape2 that is collided with
-	 * @return A Float array, [magnitude, direction], where direction is in radians <clockwise/counterclockwise>
+	 * @return A Float array, [magnitude, direction], where direction is in radians counterclockwise
 	 */
 	private Float[] findMagnitudeAndDirection(PhysicsShape shape2, Line line1, Line line2) {
 		PhysicsShape shape1 = this;
@@ -223,7 +223,7 @@ public abstract class PhysicsShape {
 				deviationAngle = (float)  (Math.PI * 2) - deviationAngle;
 			
 		}
-		System.out.println("devationAngle = " + deviationAngle);
+		//System.out.println("devationAngle = " + deviationAngle);
 		
 		boolean isTorqueNegative = (thetaCOM - direction) < 0 && (thetaCOM - direction) > (0 - Math.PI);
 		
@@ -259,6 +259,7 @@ public abstract class PhysicsShape {
 		//
 		
 		float translationForce = magnitude * (float) Math.abs(Math.cos(deviationAngle)); // i'm totally guessing on this, but it seems reasonable
+		// EDIT 2/24 - This method of finding translation force is actually incorrect, but this method will probably not be used.
 		float translationForceX = translationForce * (float) Math.cos(direction);
 		float translationForceY = translationForce * (float) Math.sin(direction);
 		
